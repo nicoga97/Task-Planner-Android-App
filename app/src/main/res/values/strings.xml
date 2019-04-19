@@ -8,7 +8,7 @@
     <string name="login_preferences">com.nicoga.taskPlanner.loginPreferences</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="button_loggin">LOGGIN</string>
+    <string name="button_loggin">LOGIN</string>
     <string name="logo_description">Task Planner App</string>
     <string name="app_name">Task Planner</string>
 
