@@ -11,5 +11,8 @@
     <string name="button_loggin">LOGIN</string>
     <string name="logo_description">Task Planner App</string>
     <string name="app_name">Task Planner</string>
+    <string name="button_create_account">Create Account</string>
+    <string name="field_validation_empty">Field can\'t be empty</string>
+    <string name="field_validation_email">Please enter a valid email address</string>
 
 </resources>
