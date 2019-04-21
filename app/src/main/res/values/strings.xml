@@ -14,5 +14,7 @@
     <string name="button_create_account">Create Account</string>
     <string name="field_validation_empty">Field can\'t be empty</string>
     <string name="field_validation_email">Please enter a valid email address</string>
+    <string name="login_failed_dialog_title">Login failed</string>
+    <string name="login_failed_dialog_message">Invalid email or password</string>
 
 </resources>

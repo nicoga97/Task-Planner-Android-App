@@ -18,6 +18,9 @@ public class LaunchActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         SharedPreferences sharedPref =
                 getSharedPreferences( getString( R.string.login_preferences ), Context.MODE_PRIVATE );
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove("TOKEN_KEY");
+        editor.apply();
 
         if(sharedPref.contains(TOKEN_KEY)){
             Intent intent = new Intent(this, MainActivity.class);
