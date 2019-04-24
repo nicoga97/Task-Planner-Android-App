@@ -56,7 +56,6 @@ public class LoginActivity extends AppCompatActivity {
         builder1.setNegativeButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
                     }
                 });
         alertDialog = builder1.create();

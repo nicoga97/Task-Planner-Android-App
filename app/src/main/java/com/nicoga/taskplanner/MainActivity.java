@@ -1,5 +1,8 @@
 package com.nicoga.taskplanner;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -93,9 +96,15 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        }else if (id == R.id.nav_send) {
+            SharedPreferences sharedPref =
+                    getSharedPreferences( getString( R.string.login_preferences ), Context.MODE_PRIVATE );
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.remove("TOKEN_KEY");
+            editor.apply();
+            finish();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
 
         }
 
