@@ -1,4 +1,4 @@
-package com.nicoga.taskplanner;
+package com.nicoga.taskplanner.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,11 @@ import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
+import com.nicoga.taskplanner.R;
+import com.nicoga.taskplanner.network.RetrofitNetwork;
+import com.nicoga.taskplanner.network.data.Task;
+import com.nicoga.taskplanner.storage.Storage;
+import com.nicoga.taskplanner.ui.LoginActivity;
 
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -21,8 +26,14 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private RetrofitNetwork retrofitNetwork;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +59,27 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        final Storage storage = new Storage(this);
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                retrofitNetwork = new RetrofitNetwork(storage.getToken());
+                getTasks();
+
+
+            }
+        });
+
+    }
+
+    private void getTasks() {
+        try {
+            for (Task t : retrofitNetwork.getTaskService().getTasks().execute().body()) {
+                System.out.println(t);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -96,9 +128,9 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        }else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_send) {
             SharedPreferences sharedPref =
-                    getSharedPreferences( getString( R.string.login_preferences ), Context.MODE_PRIVATE );
+                    getSharedPreferences(getString(R.string.login_preferences), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.remove("TOKEN_KEY");
             editor.apply();

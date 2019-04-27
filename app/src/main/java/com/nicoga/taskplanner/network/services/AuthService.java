@@ -1,8 +1,8 @@
-package com.nicoga.taskplanner.Services;
+package com.nicoga.taskplanner.network.services;
 
 
-import com.nicoga.taskplanner.LoginWrapper;
-import com.nicoga.taskplanner.Utils.Token;
+import com.nicoga.taskplanner.network.data.LoginWrapper;
+import com.nicoga.taskplanner.network.data.Token;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

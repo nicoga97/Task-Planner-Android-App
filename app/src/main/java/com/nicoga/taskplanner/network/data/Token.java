@@ -1,4 +1,4 @@
-package com.nicoga.taskplanner.Utils;
+package com.nicoga.taskplanner.network.data;
 
 public class Token {
     private String accessToken;

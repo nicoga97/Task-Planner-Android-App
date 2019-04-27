@@ -1,4 +1,4 @@
-package com.nicoga.taskplanner;
+package com.nicoga.taskplanner.network.data;
 
 public class LoginWrapper {
     private String email;

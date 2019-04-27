@@ -1,36 +1,34 @@
-package com.nicoga.taskplanner;
+package com.nicoga.taskplanner.ui;
 
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.nicoga.taskplanner.Services.AuthService;
-import com.nicoga.taskplanner.Utils.Token;
+import com.nicoga.taskplanner.network.RetrofitNetwork;
+import com.nicoga.taskplanner.network.data.LoginWrapper;
+import com.nicoga.taskplanner.R;
+import com.nicoga.taskplanner.network.data.Token;
+import com.nicoga.taskplanner.storage.Storage;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
     private TextInputLayout textInputEmail;
     private TextInputLayout textInputPassword;
-    private AuthService authService;
     private AlertDialog alertDialog;
+    private Storage storage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     @Override
@@ -39,23 +37,20 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_activity);
         textInputEmail = findViewById(R.id.textInputEmail);
         textInputPassword = findViewById(R.id.textInputPassword);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://task-panner-api.herokuapp.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        authService = retrofit.create(AuthService.class);
-        buildDialog();
+        storage=new Storage(this);
+
 
     }
 
-    private void buildDialog(){
+    private void buildDialog(String message){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
         builder1.setTitle(getApplicationContext().getResources().getString(R.string.login_failed_dialog_title));
-        builder1.setMessage(getApplicationContext().getResources().getString(R.string.login_failed_dialog_message));
+        builder1.setMessage(message);
         builder1.setCancelable(true);
         builder1.setNegativeButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        return;
                     }
                 });
         alertDialog = builder1.create();
@@ -96,47 +91,47 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login(View v) {
         if (validateEmail() && validatePassword()) {
+            v.setEnabled(false);
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Response<Token> response =
-                                authService.login(new LoginWrapper(textInputEmail.getEditText().getText().toString(), textInputPassword.getEditText().getText().toString())).execute();
+                                RetrofitNetwork.getAuthService()
+                                        .login(new LoginWrapper(textInputEmail.getEditText().getText().toString(),
+                                                textInputPassword.getEditText().getText().toString())).execute();
                         Token token =response.body();
                         if(token==null){
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    buildDialog(getApplicationContext().getResources().getString(R.string.login_failed_dialog_message));
                                     alertDialog.show();
                                 }
                             });
                             return;
                         }
-                        saveLoginInformation(token);
+                        storage.saveToken(token);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 switchToMainView();
                             }
                         });
-                    } catch (IOException e) {
+                    } catch (Exception e) {
+                        buildDialog(e.getMessage());
+                        alertDialog.show();
                         e.printStackTrace();
                     }
+
                 }
             });
+            v.setEnabled(true);
 
         } else {
             return;
         }
     }
 
-    private void saveLoginInformation(Token token) {
-        SharedPreferences sharedPref =
-                getSharedPreferences(getString(R.string.login_preferences), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove("TOKEN_KEY");
-        editor.putString("TOKEN_KEY", "Bearer "+token.getAccessToken());
-        editor.apply();
-    }
 }
 
